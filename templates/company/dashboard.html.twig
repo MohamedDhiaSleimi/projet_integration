@@ -1,0 +1,48 @@
+{# templates/company/dashboard.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Company Dashboard{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">Welcome, {{ app.user.name }}</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ path('app_company_new_offer') }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">Post New Internship Offer</h5>
+                        </div>
+                        <p class="mb-1">Create a new internship opportunity for students.</p>
+                    </a>
+                    <a href="{{ path('app_company_offers') }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">Manage My Offers</h5>
+                        </div>
+                        <p class="mb-1">View and manage your existing internship offers.</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Company Profile</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ app.user.name }}</p>
+                <p><strong>Email:</strong> {{ app.user.email }}</p>
+                <p><strong>Industry:</strong> {{ app.user.industry }}</p>
+                <p><strong>Location:</strong> {{ app.user.location }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,49 @@
+{# templates/company/offers.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}My Internship Offers{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>My Internship Offers</h1>
+    <a href="{{ path('app_company_new_offer') }}" class="btn btn-primary">Post New Offer</a>
+</div>
+
+{% if offers is empty %}
+    <div class="alert alert-info">
+        You haven't posted any internship offers yet. <a href="{{ path('app_company_new_offer') }}">Create your first offer</a>.
+    </div>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Location</th>
+                    <th>Duration</th>
+                    <th>Posted On</th>
+                    <th>Applications</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                    <tr>
+                        <td>{{ offer.title }}</td>
+                        <td>{{ offer.location }}</td>
+                        <td>{{ offer.duration }}</td>
+                        <td>{{ offer.createdAt|date('d M Y') }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ offer.applications|length }}</span>
+                        </td>
+                        <td>
+                            <a href="{{ path('app_company_offer_applicants', {'id': offer.id}) }}" class="btn btn-sm btn-outline-primary">View Applicants</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}
+

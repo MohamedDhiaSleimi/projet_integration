@@ -1,0 +1,44 @@
+{# templates/home/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome to Internship Manager{% endblock %}
+
+{% block body %}
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Internship Management Platform</h1>
+        <p class="col-md-8 fs-4">
+            Connect students with companies for great internship opportunities.
+        </p>
+        {% if not app.user %}
+            <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg">Get Started</a>
+        {% elseif is_granted('ROLE_STUDENT') %}
+            <a href="{{ path('app_student_offers') }}" class="btn btn-primary btn-lg">Browse Offers</a>
+        {% elseif is_granted('ROLE_COMPANY') %}
+            <a href="{{ path('app_company_new_offer') }}" class="btn btn-primary btn-lg">Post New Offer</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row align-items-md-stretch">
+    <div class="col-md-6">
+        <div class="h-100 p-5 text-white bg-dark rounded-3">
+            <h2>For Students</h2>
+            <p>Browse through internship offers from various companies and apply directly through our platform.</p>
+            {% if not app.user %}
+                <a href="{{ path('app_login') }}" class="btn btn-outline-light">Login as Student</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="h-100 p-5 bg-light border rounded-3">
+            <h2>For Companies</h2>
+            <p>Post internship offers and manage applications from students efficiently.</p>
+            {% if not app.user %}
+                <a href="{{ path('app_login') }}" class="btn btn-outline-secondary">Login as Company</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
