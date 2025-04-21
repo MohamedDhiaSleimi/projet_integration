@@ -73,4 +73,11 @@ class Application
         $this->status = $status;
         return $this;
     }
+
+    public function setAppliedAt(\DateTimeImmutable $appliedAt): static
+    {
+        $this->appliedAt = $appliedAt;
+
+        return $this;
+    }
 }

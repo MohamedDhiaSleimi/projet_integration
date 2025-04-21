@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\InternshipOfferRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: InternshipOfferRepository::class)]
 class InternshipOffer
 {
     #[ORM\Id]
@@ -129,6 +131,13 @@ class InternshipOffer
                 $application->setInternshipOffer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
