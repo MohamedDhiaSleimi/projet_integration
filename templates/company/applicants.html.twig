@@ -57,10 +57,20 @@
                             {% endif %}
                         </td>
                         <td>
-                            <div class="btn-group btn-group-sm">
-                                <a href="#" class="btn btn-outline-success">Accept</a>
-                                <a href="#" class="btn btn-outline-danger">Reject</a>
-                            </div>
+                            {% if application.status == 'pending' %}
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ path('app_company_accept_application', {'id': application.id}) }}" class="btn btn-outline-success">Accept</a>
+                                    <a href="{{ path('app_company_reject_application', {'id': application.id}) }}" class="btn btn-outline-danger">Reject</a>
+                                </div>
+                            {% elseif application.status == 'accepted' %}
+                                {% if application.supervisor %}
+                                    <span class="badge bg-info">Supervisor: {{ application.supervisor.name }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Awaiting Supervisor Assignment</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
