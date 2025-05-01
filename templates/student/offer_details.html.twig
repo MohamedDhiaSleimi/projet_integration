@@ -1,58 +1,77 @@
 {# templates/student/offer_details.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ offer.title }}{% endblock %}
-
-{% block body %}
-<div class="mb-4">
-    <a href="{{ path('app_student_offers') }}" class="btn btn-sm btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Back to offers
-    </a>
-</div>
-
-<div class="card mb-4">
-    <div class="card-header">
-        <h2 class="card-title mb-0">{{ offer.title }}</h2>
-    </div>
-    <div class="card-body">
-        <div class="mb-4">
-            <h5>Company Information</h5>
-            <p class="mb-1"><strong>Company:</strong> {{ offer.company.name }}</p>
-            <p class="mb-1"><strong>Industry:</strong> {{ offer.company.industry }}</p>
-            <p class="mb-1"><strong>Location:</strong> {{ offer.company.location }}</p>
-        </div>
-        
-        <div class="mb-4">
-            <h5>Internship Details</h5>
-            <p class="mb-1"><strong>Location:</strong> {{ offer.location }}</p>
-            <p class="mb-1"><strong>Duration:</strong> {{ offer.duration }}</p>
-            <p class="mb-1"><strong>Posted on:</strong> {{ offer.createdAt|date('d M Y') }}</p>
-        </div>
-        
-        <div class="mb-4">
-            <h5>Description</h5>
-            <p>{{ offer.description|nl2br }}</p>
-        </div>
-
-        {% set hasApplied = false %}
-        {% for application in app.user.applications %}
-            {% if application.internshipOffer.id == offer.id %}
-                {% set hasApplied = true %}
-                {% set applicationStatus = application.status %}
-            {% endif %}
-        {% endfor %}
-
-        {% if hasApplied %}
-            <div class="alert alert-info">
-                <p class="mb-0">You have already applied for this internship.</p>
-                <p class="mb-0"><strong>Status:</strong> {{ applicationStatus|capitalize }}</p>
-            </div>
-        {% else %}
-            <div class="text-center">
-                <a href="{{ path('app_student_apply', {'id': offer.id}) }}" class="btn btn-primary">Apply Now</a>
-            </div>
-        {% endif %}
-    </div>
-</div>
+{% block title %}
+	{{ offer.title }}
 {% endblock %}
 
+{% block body %}
+	<div class="mb-4">
+		<a href="{{ path('app_student_offers') }}" class="btn btn-sm btn-outline-secondary">
+			<i class="bi bi-arrow-left"></i>
+			Back to offers
+		</a>
+	</div>
+
+	<div class="card mb-4">
+		<div class="card-header">
+			<h2 class="card-title mb-0">{{ offer.title }}</h2>
+		</div>
+		<div class="card-body">
+			<div class="mb-4">
+				<h5>Company Information</h5>
+				<p class="mb-1">
+					<strong>Company:</strong>
+					{{ offer.company.name }}</p>
+				<p class="mb-1">
+					<strong>Industry:</strong>
+					{{ offer.company.industry }}</p>
+				<p class="mb-1">
+					<strong>Location:</strong>
+					{{ offer.company.location }}</p>
+			</div>
+
+			<div class="mb-4">
+				<h5>Internship Details</h5>
+				<p class="mb-1">
+					<strong>Location:</strong>
+					{{ offer.location }}</p>
+				<p class="mb-1">
+					<strong>Duration:</strong>
+					{{ offer.duration }}</p>
+				<p class="mb-1">
+					<strong>Posted on:</strong>
+					{{ offer.createdAt|date('d M Y') }}</p>
+			</div>
+
+			<div class="mb-4">
+				<h5>Description</h5>
+				<p>{{ offer.description|nl2br }}</p>
+			</div>
+
+			{% set hasApplied = false %}
+			{% set applicationStatus = null %}
+			{# Initialize applicationStatus #}
+			{% for application in app.user.applications %}
+				{% if application.internshipOffer.id == offer.id %}
+					{% set hasApplied = true %}
+					{% set applicationStatus = application.status %}
+				{% endif %}
+			{% endfor %}
+
+			{% if hasApplied %}
+				<div class="alert alert-info">
+					<p class="mb-0">You have already applied for this internship.</p>
+					<p class="mb-0">
+						<strong>Status:</strong>
+						{{ applicationStatus|capitalize }}</p>
+				</div>
+			{% else %}
+				<div class="text-center">
+					<a href="{{ path('app_student_apply', {'id': offer.id}) }}" class="btn btn-primary">Apply Now</a>
+				</div>
+			{% endif %}
+
+		</div>
+	</div>
+{% endblock %}

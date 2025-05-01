@@ -22,7 +22,7 @@ class Supervisor
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $departement = null;
+    private ?string $department = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $phoneNumber = null;
@@ -67,14 +67,14 @@ class Supervisor
         return $this;
     }
 
-    public function getDepartement(): ?string
+    public function getDepartment(): ?string
     {
-        return $this->departement;
+        return $this->department;
     }
 
-    public function setDepartement(?string $departement): static
+    public function setDepartment(?string $department): static
     {
-        $this->departement = $departement;
+        $this->department = $department;
 
         return $this;
     }

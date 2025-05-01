@@ -1,83 +1,120 @@
-{# templates/base.html.twig #}
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Internship Management{% endblock %}</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-        <style>
-            .nav-link.active {
-                font-weight: bold;
-            }
-        </style>
-        {% block stylesheets %}{% endblock %}
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-            <div class="container">
-                <a class="navbar-brand" href="{{ path('app_home') }}">Internship Manager</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        {% if is_granted('ROLE_STUDENT') %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if app.request.get('_route') starts with 'app_student_offers' %}active{% endif %}" href="{{ path('app_student_offers') }}">Internship Offers</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if app.request.get('_route') == 'app_student_applications' %}active{% endif %}" href="{{ path('app_student_applications') }}">My Applications</a>
-                            </li>
-                        {% elseif is_granted('ROLE_COMPANY') %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if app.request.get('_route') == 'app_company_offers' %}active{% endif %}" href="{{ path('app_company_offers') }}">My Offers</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if app.request.get('_route') == 'app_company_new_offer' %}active{% endif %}" href="{{ path('app_company_new_offer') }}">Post New Offer</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                    <ul class="navbar-nav">
-                        {% if app.user %}
-                            <li class="nav-item">
-                                <span class="nav-link">{{ app.user.name }}</span>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('app_logout') }}">Logout</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('app_login') }}">Login</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>
+			{% block title %}Internship Management
+			{% endblock %}
+		</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+		<style>
+			.nav-link.active {
+				font-weight: bold;
+			}
+		</style>
+		{% block stylesheets %}{% endblock %}
+	</head>
+	<body>
+		<!-- Main Navbar (for all users) -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+			<div class="container">
+				<a class="navbar-brand" href="{{ path('app_home') }}">Internship Manager</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+					<span class="navbar-toggler-icon"></span>
+				</button>
 
-        <div class="container mb-5">
-            {% for label, messages in app.flashes %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ label }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endfor %}
-            
-            {% block body %}{% endblock %}
-        </div>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						{% if is_granted('ROLE_STUDENT') %}
+							<li class="nav-item">
+								<a class="nav-link {% if app.request.get('_route') starts with 'app_student_offers' %}active{% endif %}" href="{{ path('app_student_offers') }}">Internship Offers</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link {% if app.request.get('_route') == 'app_student_applications' %}active{% endif %}" href="{{ path('app_student_applications') }}">My Applications</a>
+							</li>
+						{% elseif is_granted('ROLE_COMPANY') %}
+							<li class="nav-item">
+								<a class="nav-link {% if app.request.get('_route') == 'app_company_offers' %}active{% endif %}" href="{{ path('app_company_offers') }}">My Offers</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link {% if app.request.get('_route') == 'app_company_new_offer' %}active{% endif %}" href="{{ path('app_company_new_offer') }}">Post New Offer</a>
+							</li>
+						{% endif %}
+					</ul>
+					<ul class="navbar-nav">
+						{% if app.user %}
+							<li class="nav-item">
+								<span class="nav-link">{{ app.user.name }}</span>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="{{ path('app_logout') }}">Logout</a>
+							</li>
+						{% else %}
+							<li class="nav-item">
+								<a class="nav-link" href="{{ path('app_login') }}">Login</a>
+							</li>
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+		</nav>
 
-        <footer class="bg-light py-4 mt-auto">
-            <div class="container text-center">
-                <p class="mb-0">Internship Management Application &copy; {{ "now"|date("Y") }}</p>
-            </div>
-        </footer>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-        {% block javascripts %}{% endblock %}
-    </body>
+		<!-- Admin Navigation (only for ROLE_ADMIN) -->
+		{% if is_granted('ROLE_ADMIN') and app.request.get('_route') starts with 'app_admin_' %}
+			{% block admin_nav %}
+				<nav class="admin-nav navbar navbar-expand-lg">
+					<div class="container">
+						<div class="collapse navbar-collapse">
+							<ul class="navbar-nav">
+								
+								<li class="nav-item">
+									<a class="nav-link {{ app.request.get('_route') starts with 'app_admin_supervisors' ? 'active' }}" href="{{ path('app_admin_supervisors') }}">
+										<i class="fas fa-users"></i>
+										Supervisors
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link {{ app.request.get('_route') == 'app_admin_new_supervisor' ? 'active' }}" href="{{ path('app_admin_new_supervisor') }}">
+										<i class="fas fa-plus-circle"></i>
+										Add Supervisor
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link {{ app.request.get('_route') == 'app_admin_assign_supervisors' ? 'active' }}" href="{{ path('app_admin_assign_supervisors') }}">
+										<i class="fas fa-user-tie"></i>
+										Assign Supervisors
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</nav>
+			{% endblock %}
+		{% endif %}
+
+
+		<div class="container mb-5 mt-4">
+			{% for label, messages in app.flashes %}
+				{% for message in messages %}
+					<div class="alert alert-{{ label }} alert-dismissible fade show">
+						{{ message }}
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				{% endfor %}
+			{% endfor %}
+
+			{% block body %}{% endblock %}
+		</div>
+
+		<footer class="bg-light py-4 mt-auto">
+			<div class="container text-center">
+				<p class="mb-0">Internship Management Application &copy;
+					{{ "now"|date("Y") }}</p>
+			</div>
+		</footer>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+		{% block javascripts %}{% endblock %}
+	</body>
 </html>
-

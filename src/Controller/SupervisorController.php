@@ -42,7 +42,7 @@ class SupervisorController extends AbstractController {
             return $this->redirectToRoute( 'app_admin_supervisors' );
         }
 
-        return $this->render( 'admin/new_supervisor.html.twig', [
+        return $this->render( 'admin/new_supervisors.html.twig', [
             'form' => $form->createView()
         ] );
     }
@@ -51,7 +51,7 @@ class SupervisorController extends AbstractController {
 
     public function assignSupervisors( EntityManagerInterface $entityManager ): Response {
         $applications = $entityManager->getRepository( Application::class )
-        ->findBy( [ 'status' => 'accepted', 'supervisor' => null ] );
+            ->findBy( [ 'status' => 'accepted', 'supervisor' => null ] );
 
         return $this->render( 'admin/assign_supervisors.html.twig', [
             'applications' => $applications

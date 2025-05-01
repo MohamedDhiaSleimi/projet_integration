@@ -6,6 +6,7 @@ use App\Entity\Company;
 use App\Entity\InternshipOffer;
 use App\Entity\Student;
 use App\Entity\Application;
+use App\Entity\Admin;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -21,12 +22,22 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        // Create Admin User
+        $admin = new Admin();
+        $admin->setEmail('admin@example.com')
+            ->setName('Admin User')
+            ->setRoles(['ROLE_ADMIN']);
+        $hashedPassword = $this->passwordHasher->hashPassword($admin, 'admin123');
+        $admin->setPassword($hashedPassword);
+        $manager->persist($admin);
+
         // Create Students
         $student1 = new Student();
         $student1->setName('John Doe')
             ->setEmail('john@example.com')
             ->setUniversity('University of Technology')
-            ->setFieldOfStudy('Computer Science');
+            ->setFieldOfStudy('Computer Science')
+            ->setRoles(['ROLE_STUDENT']);
         $hashedPassword = $this->passwordHasher->hashPassword($student1, 'password');
         $student1->setPassword($hashedPassword);
         $manager->persist($student1);
@@ -35,7 +46,8 @@ class AppFixtures extends Fixture
         $student2->setName('Jane Smith')
             ->setEmail('jane@example.com')
             ->setUniversity('Business School')
-            ->setFieldOfStudy('Marketing');
+            ->setFieldOfStudy('Marketing')
+            ->setRoles(['ROLE_STUDENT']);
         $hashedPassword = $this->passwordHasher->hashPassword($student2, 'password');
         $student2->setPassword($hashedPassword);
         $manager->persist($student2);
@@ -45,7 +57,8 @@ class AppFixtures extends Fixture
         $company1->setName('Tech Solutions Inc.')
             ->setEmail('contact@techsolutions.com')
             ->setIndustry('Information Technology')
-            ->setLocation('Paris');
+            ->setLocation('Paris')
+            ->setRoles(['ROLE_COMPANY']);
         $hashedPassword = $this->passwordHasher->hashPassword($company1, 'password');
         $company1->setPassword($hashedPassword);
         $manager->persist($company1);
@@ -54,7 +67,8 @@ class AppFixtures extends Fixture
         $company2->setName('Marketing Pro')
             ->setEmail('info@marketingpro.com')
             ->setIndustry('Marketing')
-            ->setLocation('Lyon');
+            ->setLocation('Lyon')
+            ->setRoles(['ROLE_COMPANY']);
         $hashedPassword = $this->passwordHasher->hashPassword($company2, 'password');
         $company2->setPassword($hashedPassword);
         $manager->persist($company2);
