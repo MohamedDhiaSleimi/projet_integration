@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon CV{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Mon CV</h1>
+            
+            {% if cvs is not empty %}
+                {% for cv in cvs %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h2 class="card-title">{{ cv.title }}</h2>
+                            
+                            <div class="mb-4">
+                                <h3>Description</h3>
+                                <p>{{ cv.description }}</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3>Compétences</h3>
+                                <p>{{ cv.skills }}</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3>Formation</h3>
+                                <p>{{ cv.education }}</p>
+                            </div>
+
+                            {% if cv.experience %}
+                                <div class="mb-4">
+                                    <h3>Expérience</h3>
+                                    <p>{{ cv.experience }}</p>
+                                </div>
+                            {% endif %}
+
+                            {% if cv.languages %}
+                                <div class="mb-4">
+                                    <h3>Langues</h3>
+                                    <p>{{ cv.languages }}</p>
+                                </div>
+                            {% endif %}
+
+                            <div class="mt-4">
+                                <a href="{{ path('app_cv_edit', {'id': cv.id}) }}" class="btn btn-primary">Modifier mon CV</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    Vous n'avez pas encore créé votre CV.
+                    <a href="{{ path('app_cv_new') }}" class="btn btn-primary mt-3">Créer mon CV</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

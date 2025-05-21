@@ -18,9 +18,13 @@ class Student extends User
     #[ORM\OneToMany(mappedBy: 'student', targetEntity: Application::class, orphanRemoval: true)]
     private Collection $applications;
 
+    #[ORM\OneToMany(mappedBy: 'student', targetEntity: CV::class)]
+    private Collection $cvs;
+
     public function __construct()
     {
         $this->applications = new ArrayCollection();
+        $this->cvs = new ArrayCollection();
         $this->setRoles(['ROLE_STUDENT']);
     }
 
@@ -66,6 +70,35 @@ class Student extends User
         if ($this->applications->removeElement($application)) {
             if ($application->getStudent() === $this) {
                 $application->setStudent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CV>
+     */
+    public function getCvs(): Collection
+    {
+        return $this->cvs;
+    }
+
+    public function addCv(CV $cv): static
+    {
+        if (!$this->cvs->contains($cv)) {
+            $this->cvs->add($cv);
+            $cv->setStudent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCv(CV $cv): static
+    {
+        if ($this->cvs->removeElement($cv)) {
+            if ($cv->getStudent() === $this) {
+                $cv->setStudent(null);
             }
         }
 
