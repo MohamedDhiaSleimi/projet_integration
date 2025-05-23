@@ -6,23 +6,33 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 class SeanceEncadrementRepository extends ServiceEntityRepository
- {
-    public function __construct( ManagerRegistry $registry )
- {
-        parent::__construct( $registry, SeanceEncadrement::class );
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, SeanceEncadrement::class);
     }
 
-    // Recherche des séances par étudiant et par date
+    public function findPastSessions($student, \DateTime $now)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.Student = :student')
+            ->andWhere('s.date < :now')
+            ->setParameter('student', $student)
+            ->setParameter('now', $now)
+            ->orderBy('s.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    public function findByStudentAndDate( $student, \DateTime $date )
- {
-        return $this->createQueryBuilder( 's' )
-        ->andWhere( 's.Student = :student' )
-        ->andWhere( 's.date >= :date' ) // Séances passées ou futures
-        ->setParameter( 'student', $student )
-        ->setParameter( 'date', $date )
-        ->orderBy( 's.date', 'ASC' )
-        ->getQuery()
-        ->getResult();
+    public function findFutureSessions($student, \DateTime $now)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.Student = :student')
+            ->andWhere('s.date >= :now')
+            ->setParameter('student', $student)
+            ->setParameter('now', $now)
+            ->orderBy('s.date', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

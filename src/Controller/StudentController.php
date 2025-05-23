@@ -91,17 +91,16 @@ class StudentController extends AbstractController {
     #[ Route( '/seances', name: 'student_seances' ) ]
 
     public function seances( SeanceEncadrementRepository $seanceRepository ): Response {
-        $Student = $this->getUser();
+        $student = $this->getUser();
+        $now = new \DateTime();
 
-        // Récupérer les séances passées et futures
-        $seancesPassées = $seanceRepository->findByStudentAndDate( $Student, new \DateTime( '-1 day' ) );
-        // Séances passées
-        $seancesFutures = $seanceRepository->findByStudentAndDate( $Student, new \DateTime( '+1 day' ) );
-        // Séances futures
+        $seancesPassees = $seanceRepository->findPastSessions( $student, $now );
+        $seancesFutures = $seanceRepository->findFutureSessions( $student, $now );
 
         return $this->render( 'student/seances.html.twig', [
-            'seances_passees' => $seancesPassées,
+            'seances_passees' => $seancesPassees,
             'seances_futures' => $seancesFutures
         ] );
     }
+
 }

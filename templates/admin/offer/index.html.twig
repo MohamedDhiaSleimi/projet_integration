@@ -1,0 +1,359 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Offers Management{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1">Offers Management</h1>
+                    <p class="text-muted mb-0">Manage all internship offers</p>
+                </div>
+                <div>
+                    <a href="{{ path('app_admin_dashboard') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Filter Section #}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search offers...">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="statusFilter" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="companyFilter" class="form-select">
+                                <option value="">All Companies</option>
+                                {% for offer in offers %}
+                                    {% if offer.company.name not in (companyNames|default([])) %}
+                                        {% set companyNames = companyNames|default([])|merge([offer.company.name]) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% for companyName in companyNames|default([])|sort %}
+                                    <option value="{{ companyName }}">{{ companyName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-briefcase me-2 text-warning"></i>
+                        Internship Offers ({{ offers|length }})
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if offers|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="offersTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Offer</th>
+                                        <th scope="col">Company</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Duration</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Applications</th>
+                                        <th scope="col">Created</th>
+                                        <th scope="col" class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for offer in offers %}
+                                        <tr data-status="{{ offer.isActive ? 'active' : 'inactive' }}" data-company="{{ offer.company.name }}">
+                                            <td>
+                                                <div>
+                                                    <div class="fw-semibold">{{ offer.title }}</div>
+                                                    <div class="small text-muted">ID: {{ offer.id }}</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle bg-success bg-opacity-10 text-success me-2">
+                                                        {{ offer.company.name|first|upper }}
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-medium">{{ offer.company.name }}</div>
+                                                        <div class="small text-muted">{{ offer.company.industry ?? 'N/A' }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="small">
+                                                    <i class="bi bi-geo-alt me-1"></i>{{ offer.location ?? 'Not specified' }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info bg-opacity-10 text-info">
+                                                    {{ offer.duration ?? 'Not specified' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if offer.isActive %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle me-1"></i>Active
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        <i class="bi bi-pause-circle me-1"></i>Inactive
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% set applicationCount = offer.applications|length %}
+                                                {% if applicationCount > 0 %}
+                                                    <span class="badge bg-primary">
+                                                        {{ applicationCount }} Applications
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-light text-muted">
+                                                        No Applications
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="small">
+                                                    {{ offer.createdAt ? offer.createdAt|date('M j, Y') : 'N/A' }}
+                                                </div>
+                                                <div class="small text-muted">
+                                                    {{ offer.createdAt ? offer.createdAt|date('H:i') : '' }}
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" 
+                                                            class="btn btn-outline-info" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#offerModal"
+                                                            onclick="showOfferDetails({{ offer.id }}, '{{ offer.title|e('js') }}', '{{ offer.company.name|e('js') }}', '{{ offer.location|e('js') }}', '{{ offer.duration|e('js') }}', '{{ offer.description|e('js') }}', '{{ offer.requirements|e('js') }}', {{ offer.isActive ? 'true' : 'false' }})"
+                                                            title="View Details">
+                                                        <i class="bi bi-info-circle"></i>
+                                                    </button>
+                                                    {% if offer.applications|length > 0 %}
+                                                        <button type="button" 
+                                                                class="btn btn-outline-primary" 
+                                                                onclick="showOfferApplications({{ offer.id }}, '{{ offer.title|e('js') }}')"
+                                                                title="View Applications">
+                                                            <i class="bi bi-people"></i>
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-briefcase fs-1 text-muted mb-3"></i>
+                            <h5 class="text-muted">No Offers Found</h5>
+                            <p class="text-muted">No internship offers have been created yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Offer Details Modal #}
+<div class="modal fade" id="offerModal" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="offerModalLabel">Offer Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="offerModalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Offer Applications Modal #}
+<div class="modal fade" id="offerApplicationsModal" tabindex="-1" aria-labelledby="offerApplicationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="offerApplicationsModalLabel">Offer Applications</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="offerApplicationsModalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.table th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const companyFilter = document.getElementById('companyFilter');
+    const table = document.getElementById('offersTable');
+    
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value;
+        const companyValue = companyFilter.value;
+        const rows = table.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const status = row.getAttribute('data-status');
+            const company = row.getAttribute('data-company');
+            
+            const matchesSearch = text.includes(searchTerm);
+            const matchesStatus = !statusValue || status === statusValue;
+            const matchesCompany = !companyValue || company === companyValue;
+            
+            if (matchesSearch && matchesStatus && matchesCompany) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    searchInput.addEventListener('keyup', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    companyFilter.addEventListener('change', filterTable);
+});
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('companyFilter').value = '';
+    
+    const rows = document.querySelectorAll('#offersTable tbody tr');
+    rows.forEach(row => {
+        row.style.display = '';
+    });
+}
+
+function showOfferDetails(id, title, company, location, duration, description, requirements, isActive) {
+    const modalBody = document.getElementById('offerModalBody');
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Title</label>
+                <div class="form-control-plaintext">${title}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Company</label>
+                <div class="form-control-plaintext">${company}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Status</label>
+                <div class="form-control-plaintext">
+                    <span class="badge bg-${isActive ? 'success' : 'secondary'}">
+                        ${isActive ? 'Active' : 'Inactive'}
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Location</label>
+                <div class="form-control-plaintext">${location || 'Not specified'}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Duration</label>
+                <div class="form-control-plaintext">${duration || 'Not specified'}</div>
+            </div>
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Description</label>
+                <div class="form-control-plaintext">${description || 'No description provided'}</div>
+            </div>
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Requirements</label>
+                <div class="form-control-plaintext">${requirements || 'No requirements specified'}</div>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Offer ID</label>
+                <div class="form-control-plaintext"><code>${id}</code></div>
+            </div>
+        </div>
+    `;
+}
+
+function showOfferApplications(offerId, offerTitle) {
+    const modalLabel = document.getElementById('offerApplicationsModalLabel');
+    const modalBody = document.getElementById('offerApplicationsModalBody');
+    
+    modalLabel.textContent = `Applications for: ${offerTitle}`;
+    modalBody.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('offerApplicationsModal'));
+    modal.show();
+    
+    // In a real application, you would fetch this data via AJAX
+    setTimeout(() => {
+        modalBody.innerHTML = `
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                To view offer applications, you would typically fetch this data via AJAX from an endpoint like:
+                <code>/admin/offers/${offerId}/applications</code>
+            </div>
+            <p>This would display all applications for the offer: <strong>${offerTitle}</strong>.</p>
+        `;
+    }, 500);
+}
+</script>
+{% endblock %}

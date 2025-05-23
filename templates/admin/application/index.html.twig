@@ -1,0 +1,279 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Companies Management{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1">Companies Management</h1>
+                    <p class="text-muted mb-0">Manage all registered companies</p>
+                </div>
+                <div>
+                    <a href="{{ path('app_admin_dashboard') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-building me-2 text-success"></i>
+                        Companies List ({{ companies|length }})
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search companies..." style="width: 250px;">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if companies|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="companiesTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Company</th>
+                                        <th scope="col">Contact Email</th>
+                                        <th scope="col">Industry</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Active Offers</th>
+                                        <th scope="col">Registration Date</th>
+                                        <th scope="col" class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for company in companies %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle bg-success bg-opacity-10 text-success me-3">
+                                                        {{ company.name|first|upper }}
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold">{{ company.name }}</div>
+                                                        <div class="small text-muted">ID: {{ company.id }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a href="mailto:{{ company.contactEmail }}" class="text-decoration-none">
+                                                    {{ company.contactEmail }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info bg-opacity-10 text-info">
+                                                    {{ company.industry ?? 'Not specified' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if company.address %}
+                                                    <div class="small">
+                                                        <i class="bi bi-geo-alt me-1"></i>{{ company.address }}
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted">Not specified</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% set activeOffers = company.internshipOffers|filter(offer => offer.isActive)|length %}
+                                                {% if activeOffers > 0 %}
+                                                    <span class="badge bg-success">
+                                                        {{ activeOffers }} Active
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        0 Active
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="small">
+                                                    {{ company.createdAt ? company.createdAt|date('M j, Y') : 'N/A' }}
+                                                </div>
+                                                <div class="small text-muted">
+                                                    {{ company.createdAt ? company.createdAt|date('H:i') : '' }}
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" 
+                                                            class="btn btn-outline-info" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#companyModal"
+                                                            onclick="showCompanyDetails('{{ company.name|e('js') }}', '{{ company.contactEmail|e('js') }}', '{{ company.industry|e('js') }}', '{{ company.address|e('js') }}', '{{ company.description|e('js') }}', {{ company.id }})"
+                                                            title="View Details">
+                                                        <i class="bi bi-info-circle"></i>
+                                                    </button>
+                                                    {% if company.internshipOffers|length > 0 %}
+                                                        <button type="button" 
+                                                                class="btn btn-outline-primary" 
+                                                                onclick="showCompanyOffers({{ company.id }}, '{{ company.name|e('js') }}')"
+                                                                title="View Offers">
+                                                            <i class="bi bi-briefcase"></i>
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-building fs-1 text-muted mb-3"></i>
+                            <h5 class="text-muted">No Companies Found</h5>
+                            <p class="text-muted">No companies have registered yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Company Details Modal #}
+<div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="companyModalLabel">Company Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="companyModalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Company Offers Modal #}
+<div class="modal fade" id="companyOffersModal" tabindex="-1" aria-labelledby="companyOffersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="companyOffersModalLabel">Company Offers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="companyOffersModalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.table th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('companiesTable');
+    
+    if (searchInput && table) {
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+
+function showCompanyDetails(name, email, industry, address, description, id) {
+    const modalBody = document.getElementById('companyModalBody');
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Company Name</label>
+                <div class="form-control-plaintext">${name}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Contact Email</label>
+                <div class="form-control-plaintext">
+                    <a href="mailto:${email}" class="text-decoration-none">${email}</a>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Industry</label>
+                <div class="form-control-plaintext">${industry || 'Not specified'}</div>
+            </div>
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Address</label>
+                <div class="form-control-plaintext">${address || 'Not specified'}</div>
+            </div>
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Description</label>
+                <div class="form-control-plaintext">${description || 'No description provided'}</div>
+            </div>
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Company ID</label>
+                <div class="form-control-plaintext"><code>${id}</code></div>
+            </div>
+        </div>
+    `;
+}
+
+function showCompanyOffers(companyId, companyName) {
+    const modalLabel = document.getElementById('companyOffersModalLabel');
+    const modalBody = document.getElementById('companyOffersModalBody');
+    
+    modalLabel.textContent = `${companyName} - Internship Offers`;
+    modalBody.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('companyOffersModal'));
+    modal.show();
+    
+    // In a real application, you would fetch this data via AJAX
+    // For now, we'll show a placeholder
+    setTimeout(() => {
+        modalBody.innerHTML = `
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                To view company offers, you would typically fetch this data via AJAX from an endpoint like:
+                <code>/admin/companies/${companyId}/offers</code>
+            </div>
+            <p>This would display all internship offers from <strong>${companyName}</strong>.</p>
+        `;
+    }, 500);
+}

@@ -18,7 +18,6 @@
 				<thead>
 					<tr>
 						<th scope="col">Date</th>
-						<th scope="col">Subject</th>
 						<th scope="col">Supervisor</th>
 						<th scope="col">Comments</th>
 					</tr>
@@ -27,10 +26,8 @@
 					{% for session in sessions %}
 						<tr>
 							<td>{{ session.date|date('Y-m-d H:i') }}</td>
-							<td>{{ session.subject }}</td>
-							<td>{{ session.supervisor.nom }}
-								{{ session.supervisor.prenom }}</td>
-							<td>{{ session.comments }}</td>
+							<td>{{ session.supervisor.name }}</td>
+							<td>{{ session.commentaire }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>

@@ -1,0 +1,84 @@
+
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Session Details{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Supervision Session Details
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>ID:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ seance.id }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Date:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ seance.date|date('d/m/Y H:i') }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Student:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ seance.Student.Name }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Supervisor:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ seance.Supervisor.Name }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Comments:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="border p-3 bg-light">
+                                {{ seance.commentaire|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ path('seance_edit', {'id': seance.id}) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{{ path('seance_index') }}" class="btn btn-secondary ms-2">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <form method="post" action="{{ path('seance_delete', {'id': seance.id}) }}" 
+                          onsubmit="return confirm('Are you sure you want to delete this session?')" style="display: inline;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ seance.id) }}">
+                        <button class="btn btn-danger ms-2" type="submit">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

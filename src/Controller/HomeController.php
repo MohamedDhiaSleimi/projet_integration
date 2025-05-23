@@ -19,7 +19,9 @@ class HomeController extends AbstractController
         if ($security->isGranted('ROLE_COMPANY')) {
             return $this->redirectToRoute('app_company_dashboard');
         }
-        
+         if ($security->isGranted('ROLE_SUPERVISOR')) {
+            return $this->redirectToRoute('seance_index');
+        }
         return $this->render('home/index.html.twig');
     }
 }
