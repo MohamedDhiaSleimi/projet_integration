@@ -4,94 +4,85 @@ namespace App\Controller;
 
 use App\Entity\CV;
 use App\Entity\Student;
-use App\Form\CVType;
-use App\Repository\CVRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[Route('/cv')]
-class CVController extends AbstractController
-{
-    #[Route('/', name: 'app_cv_index', methods: ['GET'])]
-    #[IsGranted('ROLE_STUDENT')]
-    public function index(): Response
-    {
+#[ Route( '/cv' ) ]
+
+class CVController extends AbstractController {
+
+    #[ Route( '/', name: 'app_cv_index', methods: [ 'GET', 'POST' ] ) ]
+    #[ IsGranted( 'ROLE_STUDENT' ) ]
+
+    public function index( Request $request, EntityManagerInterface $em, SluggerInterface $slugger ): Response {
         /** @var Student $student */
         $student = $this->getUser();
-        $cvs = $student->getCvs();
+        $cv = $em->getRepository( CV::class )->findOneBy( [ 'student' => $student ] );
 
-        return $this->render('cv/index.html.twig', [
-            'cvs' => $cvs,
-        ]);
-    }
+        if ( $request->isMethod( 'POST' ) && $request->files->get( 'cv_file' ) ) {
+            $pdfFile = $request->files->get( 'cv_file' );
+            if ( $pdfFile->getClientOriginalExtension() !== 'pdf' ) {
+                $this->addFlash( 'danger', 'Only PDF files are allowed.' );
+            } else {
+                $originalFilename = pathinfo( $pdfFile->getClientOriginalName(), PATHINFO_FILENAME );
+                $safeFilename = $slugger->slug( $originalFilename );
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$pdfFile->guessExtension();
 
-    #[Route('/new', name: 'app_cv_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_STUDENT')]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        /** @var Student $student */
-        $student = $this->getUser();
-        $cv = new CV();
-        $form = $this->createForm(CVType::class, $cv);
-        $form->handleRequest($request);
+                try {
+                    $pdfFile->move(
+                        $this->getParameter( 'cv_directory' ),
+                        $newFilename
+                    );
+                } catch ( FileException $e ) {
+                    $this->addFlash( 'danger', 'Failed to upload CV.' );
+                }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $cv->setStudent($student);
-            $entityManager->persist($cv);
-            $entityManager->flush();
+                if ( !$cv ) {
+                    $cv = new CV();
+                    $cv->setStudent( $student );
+                    $em->persist( $cv );
+                } else {
+                    // Remove old file if needed
+                    $oldPath = $this->getParameter( 'cv_directory' ) . '/' . $cv->getFilePath();
+                    if ( file_exists( $oldPath ) ) {
+                        unlink( $oldPath );
+                    }
+                }
 
-            $this->addFlash('success', 'CV created successfully.');
-            return $this->redirectToRoute('app_cv_index');
+                $cv->setFilePath( $newFilename );
+                $em->flush();
+
+                $this->addFlash( 'success', 'CV uploaded successfully.' );
+                return $this->redirectToRoute( 'app_cv_index' );
+            }
         }
 
-        return $this->render('cv/new.html.twig', [
+        return $this->render( 'cv/index.html.twig', [
             'cv' => $cv,
-            'form' => $form->createView(),
-        ]);
+        ] );
     }
 
-    #[Route('/{id}/edit', name: 'app_cv_edit', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_STUDENT')]
-    public function edit(Request $request, CV $cv, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(CVType::class, $cv);
-        $form->handleRequest($request);
+    #[ Route( '/company/view/{id}', name: 'app_cv_company_view', methods: [ 'GET' ] ) ]
+    #[ IsGranted( 'ROLE_COMPANY' ) ]
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            $this->addFlash('success', 'CV updated successfully.');
-            return $this->redirectToRoute('app_cv_index');
-        }
-
-        return $this->render('cv/edit.html.twig', [
+    public function companyView( CV $cv ): Response {
+        return $this->render( 'cv/company_view.html.twig', [
             'cv' => $cv,
-            'form' => $form->createView(),
-        ]);
+        ] );
     }
 
-    #[Route('/{id}', name: 'app_cv_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_STUDENT')]
-    public function delete(Request $request, CV $cv, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$cv->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($cv);
-            $entityManager->flush();
-        }
+    #[ Route( '/download/{id}', name: 'app_cv_download', methods: [ 'GET' ] ) ]
+    #[ IsGranted( 'ROLE_COMPANY' ) ]
 
-        return $this->redirectToRoute('app_cv_index');
-    }
+    public function download( CV $cv ): Response {
+        $file = $this->getParameter( 'cv_directory' ) . '/' . $cv->getFilePath();
 
-    #[Route('/view/{id}', name: 'app_cv_view', methods: ['GET'])]
-    #[IsGranted('ROLE_COMPANY')]
-    public function view(CV $cv): Response
-    {
-        return $this->render('cv/view.html.twig', [
-            'cv' => $cv,
-        ]);
+        return $this->file( $file );
     }
-} 
+}
