@@ -30,10 +30,10 @@ class Application {
     #[ ORM\ManyToOne( inversedBy: 'applications' ) ]
     private ?Supervisor $supervisor = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ ORM\Column( type: Types::DATE_MUTABLE, nullable: true ) ]
     private ?\DateTimeInterface $startDate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ ORM\Column( type: Types::DATE_MUTABLE, nullable: true ) ]
     private ?\DateTimeInterface $endDate = null;
 
     public function __construct() {
@@ -92,24 +92,24 @@ class Application {
     }
 
     public function getStartDate(): ?\DateTimeInterface
-    {
+ {
         return $this->startDate;
     }
 
-    public function setStartDate(?\DateTimeInterface $startDate): static
-    {
+    public function setStartDate( ?\DateTimeInterface $startDate ): static
+ {
         $this->startDate = $startDate;
 
         return $this;
     }
 
     public function getEndDate(): ?\DateTimeInterface
-    {
+ {
         return $this->endDate;
     }
 
-    public function setEndDate(?\DateTimeInterface $endDate): static
-    {
+    public function setEndDate( ?\DateTimeInterface $endDate ): static
+ {
         $this->endDate = $endDate;
 
         return $this;
