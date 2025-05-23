@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<title>
 			{% block title %}Internship Management
 			{% endblock %}
 		</title>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"/>
 		<style>
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+			}
+
+			body {
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+			}
+
+			/* Main content area grows to fill remaining space */
+			.main-content {
+				flex: 1 0 auto; /* grow and shrink, initial auto */
+			}
+
+			footer {
+				flex-shrink: 0; /* don't shrink */
+			}
+
 			.nav-link.active {
 				font-weight: bold;
 			}
@@ -43,25 +64,12 @@
 							<li class="nav-item">
 								<a class="nav-link {% if app.request.get('_route') == 'app_company_new_offer' %}active{% endif %}" href="{{ path('app_company_new_offer') }}">Post New Offer</a>
 							</li>
-						{% endif %}
-						{% if is_granted('ROLE_ADMIN') %}
+						{% elseif is_granted('ROLE_ADMIN') %}
 
 							<li class="nav-item">
-								<a class="nav-link {{ app.request.get('_route') starts with 'app_admin_supervisors' ? 'active' }}" href="{{ path('app_admin_supervisors') }}">
+								<a class="nav-link {{ app.request.get('_route') starts with 'app_admin_dashboard' ? 'active' }}" href="{{ path('app_admin_dashboard') }}">
 									<i class="fas fa-users"></i>
-									Supervisors
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link {{ app.request.get('_route') == 'app_admin_new_supervisor' ? 'active' }}" href="{{ path('app_admin_new_supervisor') }}">
-									<i class="fas fa-plus-circle"></i>
-									Add Supervisor
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link {{ app.request.get('_route') == 'app_admin_assign_supervisors' ? 'active' }}" href="{{ path('app_admin_assign_supervisors') }}">
-									<i class="fas fa-user-tie"></i>
-									Assign Supervisors
+									Dashboard
 								</a>
 							</li>
 						{% endif %}
@@ -84,8 +92,7 @@
 			</div>
 		</nav>
 
-
-		<div class="container mb-5 mt-4">
+		<div class="container mb-5 mt-4 main-content">
 			{% for label, messages in app.flashes %}
 				{% for message in messages %}
 					<div class="alert alert-{{ label }} alert-dismissible fade show">
@@ -100,12 +107,14 @@
 
 		<footer class="bg-light py-4 mt-auto">
 			<div class="container text-center">
-				<p class="mb-0">Internship Management Application &copy;
-					{{ "now"|date("Y") }}</p>
+				<p class="mb-0">
+					Internship Management Application &copy;
+					{{ "now"|date("Y") }}
+				</p>
 			</div>
 		</footer>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 		{% block javascripts %}{% endblock %}
 	</body>
-</html></body></html>
+</html>

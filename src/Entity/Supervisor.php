@@ -1,5 +1,5 @@
 <?php
-
+// src/Entity/Supervisor.php
 namespace App\Entity;
 
 use App\Repository\SupervisorRepository;
@@ -7,114 +7,96 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SupervisorRepository::class)]
-class Supervisor
-{
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+#[ ORM\Entity( repositoryClass: SupervisorRepository::class ) ]
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $email = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
+class Supervisor extends User {
+    #[ ORM\Column( length: 255, nullable: true ) ]
     private ?string $department = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ ORM\Column( length: 255, nullable: true ) ]
     private ?string $phoneNumber = null;
 
     /**
-     * @var Collection<int, application>
-     */
-    #[ORM\OneToMany(targetEntity: application::class, mappedBy: 'supervisor')]
+    * @var Collection<int, Application>
+    */
+    #[ ORM\OneToMany( targetEntity: Application::class, mappedBy: 'supervisor' ) ]
     private Collection $applications;
+    #[ ORM\OneToMany( mappedBy: 'encadrant', targetEntity: SeanceEncadrement::class, orphanRemoval: true ) ]
+    private Collection $seances;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->applications = new ArrayCollection();
+        $this->seances = new ArrayCollection();
+        $this->setRoles( [ 'ROLE_SUPERVISOR' ] );
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    public function getDepartment(): ?string
-    {
+    public function getDepartment(): ?string {
         return $this->department;
     }
 
-    public function setDepartment(?string $department): static
-    {
+    public function setDepartment( ?string $department ): static {
         $this->department = $department;
 
         return $this;
     }
 
-    public function getPhoneNumber(): ?string
-    {
+    public function getPhoneNumber(): ?string {
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(?string $phoneNumber): static
-    {
+    public function setPhoneNumber( ?string $phoneNumber ): static {
         $this->phoneNumber = $phoneNumber;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, application>
-     */
-    public function getApplications(): Collection
-    {
+    * @return Collection<int, Application>
+    */
+
+    public function getApplications(): Collection {
         return $this->applications;
     }
 
-    public function addApplication(application $application): static
-    {
-        if (!$this->applications->contains($application)) {
-            $this->applications->add($application);
-            $application->setSupervisor($this);
+    public function addApplication( Application $application ): static {
+        if ( !$this->applications->contains( $application ) ) {
+            $this->applications->add( $application );
+            $application->setSupervisor( $this );
+        }
+
+        return $this;
+    }
+    /**
+    * @return Collection<int, SeanceEncadrement>
+    */
+
+    public function getSeances(): Collection {
+        return $this->seances;
+    }
+
+    public function addSeance( SeanceEncadrement $seance ): static {
+        if ( !$this->seances->contains( $seance ) ) {
+            $this->seances->add( $seance );
+            $seance->setSupervisor( $this );
         }
 
         return $this;
     }
 
-    public function removeApplication(application $application): static
-    {
-        if ($this->applications->removeElement($application)) {
-            // set the owning side to null (unless already changed)
-            if ($application->getSupervisor() === $this) {
-                $application->setSupervisor(null);
+    public function removeSeance( SeanceEncadrement $seance ): static {
+        if ( $this->seances->removeElement( $seance ) ) {
+            if ( $seance->getSupervisor() === $this ) {
+                $seance->setSupervisor( null );
+            }
+        }
+
+        return $this;
+    }
+
+    public function removeApplication( Application $application ): static {
+        if ( $this->applications->removeElement( $application ) ) {
+            if ( $application->getSupervisor() === $this ) {
+                $application->setSupervisor( null );
             }
         }
 

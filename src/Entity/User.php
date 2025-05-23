@@ -10,10 +10,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\InheritanceType("SINGLE_TABLE")]
 #[ORM\DiscriminatorColumn(name: "type", type: "string")]
 #[ORM\DiscriminatorMap([
-    "student" => "Student", 
+    "student" => "Student",
     "company" => "Company",
-    "admin" => "Admin"
+    "admin" => "Admin",
+    "supervisor" => "Supervisor"
 ])]
+
 abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
