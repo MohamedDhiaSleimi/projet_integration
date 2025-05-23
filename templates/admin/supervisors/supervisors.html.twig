@@ -1,0 +1,85 @@
+{% extends './base.html.twig' %}
+{% block title %}Manage Supervisors{% endblock %}
+
+{% block body %}
+<style>
+	/* Custom styles for supervisors table */
+	.table thead th {
+		background-color: #343a40; /* Bootstrap dark */
+		color: #fff;
+		border-bottom: 3px solid #495057;
+		box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+	}
+	.table tbody tr:hover {
+		background-color: #f1f3f5;
+		transition: background-color 0.3s ease;
+	}
+	.badge.bg-secondary {
+		background-color: #6c757d;
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+	.page-content {
+		background-color: #fff;
+		padding: 2rem;
+		border-radius: 0.5rem;
+		box-shadow: 0 0 10px rgba(0,0,0,0.05);
+	}
+</style>
+
+<div class="page-content">
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1 class="h3 fw-bold text-primary">College Supervisors</h1>
+		<div>
+			<a href="{{ path('app_admin_new_supervisor') }}" class="btn btn-success me-3" title="Add a new supervisor">
+				<i class="bi bi-person-plus me-1"></i> Add New Supervisor
+			</a>
+			<a href="{{ path('app_admin_assign_supervisors') }}" class="btn btn-primary" title="Assign supervisors to internships">
+				<i class="bi bi-link-45deg me-1"></i> Assign Supervisors
+			</a>
+		</div>
+	</div>
+
+	{% if supervisors is empty %}
+		<div class="alert alert-info rounded-3 shadow-sm">
+			No supervisors have been added yet.
+			<a href="{{ path('app_admin_new_supervisor') }}" class="alert-link">Add your first supervisor</a>.
+		</div>
+	{% else %}
+		<div class="table-responsive rounded-3 shadow-sm">
+			<table class="table table-striped table-hover align-middle mb-0">
+				<thead class="table-dark sticky-top">
+					<tr>
+						<th scope="col" class="py-3">Name</th>
+						<th scope="col" class="py-3">Email</th>
+						<th scope="col" class="py-3">Department</th>
+						<th scope="col" class="py-3">Phone Number</th>
+						<th scope="col" class="text-center py-3">Assigned Internships</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for supervisor in supervisors %}
+						<tr>
+							<td class="fw-semibold">{{ supervisor.name }}</td>
+							<td>
+								<a href="mailto:{{ supervisor.email }}" class="text-decoration-none" title="Send email to {{ supervisor.name }}">
+									{{ supervisor.email }}
+								</a>
+							</td>
+							<td>{{ supervisor.department }}</td>
+							<td>
+								<a href="tel:{{ supervisor.phoneNumber }}" class="text-decoration-none" title="Call {{ supervisor.name }}">
+									{{ supervisor.phoneNumber }}
+								</a>
+							</td>
+							<td class="text-center">
+								<span class="badge bg-secondary">{{ supervisor.applications|length }}</span>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+</div>
+{% endblock %}

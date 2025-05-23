@@ -56,7 +56,7 @@ class AdminController extends AbstractController
     #[Route('/supervisors', name: 'app_admin_supervisor_index')]
     public function supervisors(SupervisorRepository $supervisorRepository): Response
     {
-        return $this->render('admin/supervisors.html.twig', [
+        return $this->render('admin/supervisors/supervisors.html.twig', [
             'supervisors' => $supervisorRepository->findAll(),
         ]);
     }
