@@ -59,7 +59,7 @@ class SeanceEncadrement
         return $this->Student;
     }
 
-    public function setEtudiant(?Student $Student): self
+    public function setStudent(?Student $Student): self
     {
         $this->Student = $Student;
         return $this;
