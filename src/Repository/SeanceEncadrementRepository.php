@@ -17,7 +17,7 @@ class SeanceEncadrementRepository extends ServiceEntityRepository
     public function findByStudentAndDate( $student, \DateTime $date )
  {
         return $this->createQueryBuilder( 's' )
-        ->andWhere( 's.student = :student' )
+        ->andWhere( 's.Student = :student' )
         ->andWhere( 's.date >= :date' ) // Séances passées ou futures
         ->setParameter( 'student', $student )
         ->setParameter( 'date', $date )

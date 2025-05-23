@@ -1,48 +1,65 @@
 {# templates/student/dashboard.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Student Dashboard{% endblock %}
-
-{% block body %}
-<h1 class="mb-4">Welcome, {{ app.user.name }}</h1>
-
-<div class="row">
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Quick Actions</h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <a href="{{ path('app_student_offers') }}" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">Browse Internship Offers</h5>
-                        </div>
-                        <p class="mb-1">Find the perfect internship opportunity for your career.</p>
-                    </a>
-                    <a href="{{ path('app_student_applications') }}" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">View My Applications</h5>
-                        </div>
-                        <p class="mb-1">Track the status of your internship applications.</p>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">My Profile</h5>
-            </div>
-            <div class="card-body">
-                <p><strong>Name:</strong> {{ app.user.name }}</p>
-                <p><strong>Email:</strong> {{ app.user.email }}</p>
-                <p><strong>University:</strong> {{ app.user.university }}</p>
-                <p><strong>Field of Study:</strong> {{ app.user.fieldOfStudy }}</p>
-            </div>
-        </div>
-    </div>
-</div>
+{% block title %}Student Dashboard
 {% endblock %}
 
+{% block body %}
+	<h1 class="mb-4">Welcome,
+		{{ app.user.name }}</h1>
+
+	<div
+		class="row">
+		<!-- Quick Actions -->
+		<div class="col-md-6">
+			<div class="card shadow-sm mb-4">
+				<div class="card-header bg-primary text-white">
+					<h5 class="card-title mb-0">Quick Actions</h5>
+				</div>
+				<div class="card-body p-0">
+					<div class="list-group list-group-flush">
+						<a href="{{ path('app_student_offers') }}" class="list-group-item list-group-item-action">
+							<h6 class="mb-1">Browse Internship Offers</h6>
+							<p class="mb-0 text-muted">Find the perfect internship opportunity for your career.</p>
+						</a>
+						<a href="{{ path('app_student_applications') }}" class="list-group-item list-group-item-action">
+							<h6 class="mb-1">View My Applications</h6>
+							<p class="mb-0 text-muted">Track the status of your internship applications.</p>
+						</a>
+						<a href="{{ path('student_seances') }}" class="list-group-item list-group-item-action">
+							<h6 class="mb-1">Supervision Sessions</h6>
+							<p class="mb-0 text-muted">Access your past and upcoming supervision sessions.</p>
+						</a>
+						<a href="{{ path('app_student_supervision_history') }}" class="list-group-item list-group-item-action">
+							<h6 class="mb-1">Supervision History</h6>
+							<p class="mb-0 text-muted">Review all your previous supervision sessions.</p>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Profile Info -->
+		<div class="col-md-6">
+			<div class="card shadow-sm">
+				<div class="card-header bg-secondary text-white">
+					<h5 class="card-title mb-0">My Profile</h5>
+				</div>
+				<div class="card-body">
+					<p>
+						<strong>Name:</strong>
+						{{ app.user.name }}</p>
+					<p>
+						<strong>Email:</strong>
+						{{ app.user.email }}</p>
+					<p>
+						<strong>University:</strong>
+						{{ app.user.university }}</p>
+					<p>
+						<strong>Field of Study:</strong>
+						{{ app.user.fieldOfStudy }}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

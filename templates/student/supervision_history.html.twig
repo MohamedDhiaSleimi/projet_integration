@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Supervision History
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<h1 class="mb-4">Supervision History</h1>
+		<div class="mb-4">
+			<a href="{{ path('app_student_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+				<i class="bi bi-arrow-left"></i>
+				Back to My Dashboard
+			</a>
+		</div>
+
+		{% if sessions is not empty %}
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th scope="col">Date</th>
+						<th scope="col">Subject</th>
+						<th scope="col">Supervisor</th>
+						<th scope="col">Comments</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for session in sessions %}
+						<tr>
+							<td>{{ session.date|date('Y-m-d H:i') }}</td>
+							<td>{{ session.subject }}</td>
+							<td>{{ session.supervisor.nom }}
+								{{ session.supervisor.prenom }}</td>
+							<td>{{ session.comments }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% else %}
+			<div class="alert alert-info">No supervision sessions found.</div>
+		{% endif %}
+	</div>
+{% endblock %}
