@@ -13,7 +13,7 @@ class CV {
     #[ ORM\Column ]
     private ?int $id = null;
 
-    #[ ORM\ManyToOne( inversedBy: 'cvs' ) ]
+    #[ ORM\OneToOne( inversedBy: 'cv' ) ]
     #[ ORM\JoinColumn( nullable: false ) ]
     private ?Student $student = null;
 

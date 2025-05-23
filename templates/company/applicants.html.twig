@@ -57,19 +57,26 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if application.status == 'pending' %}
-                                <div class="btn-group btn-group-sm">
+                            <div class="btn-group btn-group-sm mb-1">
+                                {% if application.status == 'pending' %}
                                     <a href="{{ path('app_company_accept_application', {'id': application.id}) }}" class="btn btn-outline-success">Accept</a>
                                     <a href="{{ path('app_company_reject_application', {'id': application.id}) }}" class="btn btn-outline-danger">Reject</a>
-                                </div>
-                            {% elseif application.status == 'accepted' %}
-                                {% if application.supervisor %}
-                                    <span class="badge bg-info">Supervisor: {{ application.supervisor.name }}</span>
+                                {% elseif application.status == 'accepted' %}
+                                    {% if application.supervisor %}
+                                        <span class="badge bg-info">Supervisor: {{ application.supervisor.name }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Awaiting Supervisor Assignment</span>
+                                    {% endif %}
                                 {% else %}
-                                    <span class="badge bg-secondary">Awaiting Supervisor Assignment</span>
+                                    <span class="text-muted">N/A</span>
                                 {% endif %}
+                            </div>
+                            {% if application.student.cv %}
+                                <a href="{{ path('app_cv_company_view', {id: application.student.cv.id}) }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                    <i class="bi bi-file-earmark-person"></i> View CV
+                                </a>
                             {% else %}
-                                <span class="text-muted">N/A</span>
+                                <span class="badge bg-light text-muted">No CV</span>
                             {% endif %}
                         </td>
                     </tr>

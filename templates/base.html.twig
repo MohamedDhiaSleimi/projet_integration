@@ -33,6 +33,9 @@
 							<li class="nav-item">
 								<a class="nav-link {% if app.request.get('_route') == 'app_student_applications' %}active{% endif %}" href="{{ path('app_student_applications') }}">My Applications</a>
 							</li>
+							<li class="nav-item">
+								<a class="nav-link {% if app.request.get('_route') == 'app_cv_index' %}active{% endif %}" href="{{ path('app_cv_index') }}">My Applications</a>
+							</li>
 						{% elseif is_granted('ROLE_COMPANY') %}
 							<li class="nav-item">
 								<a class="nav-link {% if app.request.get('_route') == 'app_company_offers' %}active{% endif %}" href="{{ path('app_company_offers') }}">My Offers</a>

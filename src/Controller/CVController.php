@@ -49,13 +49,13 @@ class CVController extends AbstractController {
                     $em->persist( $cv );
                 } else {
                     // Remove old file if needed
-                    $oldPath = $this->getParameter( 'cv_directory' ) . '/' . $cv->getFilePath();
+                    $oldPath = $this->getParameter( 'cv_directory' ) . '/' . $cv->getFilename();
                     if ( file_exists( $oldPath ) ) {
                         unlink( $oldPath );
                     }
                 }
 
-                $cv->setFilePath( $newFilename );
+                $cv->setFilename( $newFilename );
                 $em->flush();
 
                 $this->addFlash( 'success', 'CV uploaded successfully.' );
@@ -81,7 +81,7 @@ class CVController extends AbstractController {
     #[ IsGranted( 'ROLE_COMPANY' ) ]
 
     public function download( CV $cv ): Response {
-        $file = $this->getParameter( 'cv_directory' ) . '/' . $cv->getFilePath();
+        $file = $this->getParameter( 'cv_directory' ) . '/' . $cv->getFilename();
 
         return $this->file( $file );
     }

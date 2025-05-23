@@ -18,13 +18,12 @@ class Student extends User
     #[ORM\OneToMany(mappedBy: 'student', targetEntity: Application::class, orphanRemoval: true)]
     private Collection $applications;
 
-    #[ORM\OneToMany(mappedBy: 'student', targetEntity: CV::class)]
-    private Collection $cvs;
+    #[ORM\OneToOne(mappedBy: 'student', targetEntity: CV::class, cascade: ['persist', 'remove'])]
+    private ?CV $cv = null;
 
     public function __construct()
     {
         $this->applications = new ArrayCollection();
-        $this->cvs = new ArrayCollection();
         $this->setRoles(['ROLE_STUDENT']);
     }
 
@@ -50,6 +49,9 @@ class Student extends User
         return $this;
     }
 
+    /**
+     * @return Collection<int, Application>
+     */
     public function getApplications(): Collection
     {
         return $this->applications;
@@ -76,32 +78,19 @@ class Student extends User
         return $this;
     }
 
-    /**
-     * @return Collection<int, CV>
-     */
-    public function getCvs(): Collection
+    public function getCv(): ?CV
     {
-        return $this->cvs;
+        return $this->cv;
     }
 
-    public function addCv(CV $cv): static
+    public function setCv(?CV $cv): static
     {
-        if (!$this->cvs->contains($cv)) {
-            $this->cvs->add($cv);
+        // set the owning side of the relation if necessary
+        if ($cv !== null && $cv->getStudent() !== $this) {
             $cv->setStudent($this);
         }
 
-        return $this;
-    }
-
-    public function removeCv(CV $cv): static
-    {
-        if ($this->cvs->removeElement($cv)) {
-            if ($cv->getStudent() === $this) {
-                $cv->setStudent(null);
-            }
-        }
-
+        $this->cv = $cv;
         return $this;
     }
 }
