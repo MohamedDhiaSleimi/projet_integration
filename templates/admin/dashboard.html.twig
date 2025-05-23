@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Admin Dashboard</h1>
+                <div class="text-muted">
+                    <i class="bi bi-calendar3"></i>
+                    {{ "now"|date("F j, Y") }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Statistics Cards #}
+    <div class="row mb-5">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-people-fill text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="small text-muted">Total Students</div>
+                            <div class="h4 mb-0">{{ students_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="{{ path('app_admin_student_index') }}" class="btn btn-outline-primary btn-sm">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-building text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="small text-muted">Total Companies</div>
+                            <div class="h4 mb-0">{{ companies_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="{{ path('app_admin_company_index') }}" class="btn btn-outline-success btn-sm">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-person-badge text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="small text-muted">Total Supervisors</div>
+                            <div class="h4 mb-0">{{ supervisors_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="{{ path('app_admin_supervisor_index') }}" class="btn btn-outline-info btn-sm">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-briefcase text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="small text-muted">Total Offers</div>
+                            <div class="h4 mb-0">{{ offers_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="{{ path('app_admin_offer_index') }}" class="btn btn-outline-warning btn-sm">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Recent Activity Section #}
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Applications</h5>
+                    <a href="{{ path('app_admin_application_index') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_applications|length > 0 %}
+                        <div class="list-group list-group-flush">
+                            {% for application in recent_applications %}
+                                <div class="list-group-item px-0 py-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ application.student.name }} </h6>
+                                            <p class="mb-1 text-muted small">{{ application.internshipOffer.title }}</p>
+                                            <small class="text-muted">{{ application.internshipOffer.company.name }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-{{ application.status == 'pending' ? 'warning' : (application.status == 'accepted' ? 'success' : 'danger') }}">
+                                                {{ application.status|title }}
+                                            </span>
+                                            <div class="small text-muted mt-1">
+                                                {{ application.appliedAt|date('M j') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-1 mb-3"></i>
+                            <p>No recent applications</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Offers</h5>
+                    <a href="{{ path('app_admin_offer_index') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_offers|length > 0 %}
+                        <div class="list-group list-group-flush">
+                            {% for offer in recent_offers %}
+                                <div class="list-group-item px-0 py-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ offer.title }}</h6>
+                                            <p class="mb-1 text-muted small">{{ offer.company.name }}</p>
+                                            <small class="text-muted">
+                                                <i class="bi bi-geo-alt me-1"></i>{{ offer.location }}
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-{{ offer.isActive ? 'success' : 'secondary' }}">
+                                                {{ offer.isActive ? 'Active' : 'Inactive' }}
+                                            </span>
+                                            <div class="small text-muted mt-1">
+                                                {{ offer.createdAt|date('M j') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-briefcase fs-1 mb-3"></i>
+                            <p>No recent offers</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

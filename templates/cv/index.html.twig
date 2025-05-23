@@ -1,11 +1,224 @@
-<h2>Upload your CV</h2>
-<form method="post" enctype="multipart/form-data">
-	<input type="file" name="cv_file" accept="application/pdf" required>
-	<button class="btn btn-primary mt-2" type="submit">Upload</button>
-</form>
+{% extends 'base.html.twig' %}
+{% block title %}CV Management
+{% endblock %}
+{% block body %}
+	<div class="container-fluid mt-5">
+		<div class="row">
+			{# Upload Section #}
+			<div class="col-md-4">
+				<div class="card shadow-sm border-0 rounded-3 h-100">
+					<div class="card-body">
+						<h2 class="card-title mb-4 text-center">Upload Your CV</h2>
+						<form method="post" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
+							<div class="mb-3 w-100">
+								<input type="file" name="cv_file" accept="application/pdf" class="form-control" required>
+								<div class="form-text">Only PDF files are accepted (max 5MB)</div>
+							</div>
+							<button type="submit" class="btn btn-primary">Upload</button>
+						</form>
+						
+						{% if cv %}
+							<hr class="my-4">
+							<div class="text-center">
+								<h5 class="mb-3">Current CV</h5>
+								<p class="text-muted mb-3">{{ cv.originalFilename ?? 'cv.pdf' }}</p>
+								<div class="d-flex flex-column gap-2">
+									<button id="zoomIn" class="btn btn-outline-secondary btn-sm">Zoom In (+)</button>
+									<button id="zoomOut" class="btn btn-outline-secondary btn-sm">Zoom Out (-)</button>
+									<button id="resetZoom" class="btn btn-outline-secondary btn-sm">Reset Zoom</button>
+									<a href="{{ asset('uploads/cvs/' ~ cv.Filename) }}" class="btn btn-outline-primary btn-sm" download="{{ cv.originalFilename ?? 'cv.pdf' }}">
+										Download PDF
+									</a>
+								</div>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			
+			{# PDF Viewer Section #}
+			{% if cv %}
+				<div class="col-md-8">
+					<div class="card shadow-sm border-0 rounded-3 h-100">
+						<div class="card-body p-2">
+							<div class="pdf-viewer-container" style="height: calc(100vh - 120px); overflow: auto; background: #f8f9fa; border-radius: 8px;">
+								<div class="d-flex justify-content-center p-3">
+									<div id="pdfContainer" style="box-shadow: 0 4px 20px rgba(0,0,0,0.15); background: white;">
+										<embed 
+											id="pdfViewer" 
+											src="{{ asset('uploads/cvs/' ~ cv.Filename) }}#toolbar=0&navpanes=0&scrollbar=0&view=FitH" 
+											type="application/pdf"
+											style="display: block; border: none;">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}
 
-{% if cv %}
-	<hr>
-	<h3>Current CV</h3>
-	<embed src="{{ asset('uploads/cvs/' ~ cv.filePath) }}" type="application/pdf" width="100%" height="600px"/>
-{% endif %}
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const pdfViewer = document.getElementById('pdfViewer');
+			const pdfContainer = document.getElementById('pdfContainer');
+			const zoomInBtn = document.getElementById('zoomIn');
+			const zoomOutBtn = document.getElementById('zoomOut');
+			const resetZoomBtn = document.getElementById('resetZoom');
+			
+			if (pdfViewer && pdfContainer) {
+				// PDF page dimensions in points (1 point = 1/72 inch)
+				// A4 size: 595.28 × 841.89 points
+				const A4_WIDTH_POINTS = 595.28;
+				const A4_HEIGHT_POINTS = 841.89;
+				
+				// Convert points to pixels (assuming 96 DPI standard)
+				// 1 inch = 72 points = 96 pixels
+				const POINTS_TO_PIXELS = 96 / 72;
+				
+				// Calculate actual page size in pixels
+				const pageWidthPx = Math.round(A4_WIDTH_POINTS * POINTS_TO_PIXELS);
+				const pageHeightPx = Math.round(A4_HEIGHT_POINTS * POINTS_TO_PIXELS);
+				
+				// Zoom control variables
+				let scale = 1;
+				const minScale = 0.3;
+				const maxScale = 3;
+				const scaleStep = 0.2;
+				
+				// Apply zoom and size
+				function applyZoom() {
+					const finalWidth = Math.round(pageWidthPx * scale);
+					const finalHeight = Math.round(pageHeightPx * scale);
+					
+					pdfViewer.style.width = finalWidth + 'px';
+					pdfViewer.style.height = finalHeight + 'px';
+					
+					// Update container size to match
+					pdfContainer.style.width = finalWidth + 'px';
+					pdfContainer.style.height = finalHeight + 'px';
+					
+					// Update button states
+					updateButtonStates();
+				}
+				
+				function updateButtonStates() {
+					if (zoomInBtn) zoomInBtn.disabled = (scale >= maxScale);
+					if (zoomOutBtn) zoomOutBtn.disabled = (scale <= minScale);
+				}
+				
+				// Zoom functions
+				function zoomIn() {
+					if (scale < maxScale) {
+						scale = Math.min(scale + scaleStep, maxScale);
+						applyZoom();
+					}
+				}
+				
+				function zoomOut() {
+					if (scale > minScale) {
+						scale = Math.max(scale - scaleStep, minScale);
+						applyZoom();
+					}
+				}
+				
+				function resetZoom() {
+					scale = 1;
+					applyZoom();
+				}
+				
+				// Event listeners
+				if (zoomInBtn) zoomInBtn.addEventListener('click', zoomIn);
+				if (zoomOutBtn) zoomOutBtn.addEventListener('click', zoomOut);
+				if (resetZoomBtn) resetZoomBtn.addEventListener('click', resetZoom);
+				
+				// Keyboard shortcuts
+				document.addEventListener('keydown', function(e) {
+					if (e.ctrlKey || e.metaKey) {
+						switch(e.key) {
+							case '+':
+							case '=':
+								e.preventDefault();
+								zoomIn();
+								break;
+							case '-':
+								e.preventDefault();
+								zoomOut();
+								break;
+							case '0':
+								e.preventDefault();
+								resetZoom();
+								break;
+						}
+					}
+				});
+				
+				// Initial setup
+				applyZoom();
+				
+				// Handle PDF load
+				pdfViewer.addEventListener('load', function() {
+					console.log('PDF loaded with dimensions:', pageWidthPx + 'x' + pageHeightPx + 'px');
+				});
+				
+				// Handle window resize - maintain actual size
+				window.addEventListener('resize', function () {
+					// Don't change scale on resize, maintain actual page size
+					applyZoom();
+				});
+			}
+		});
+	</script>
+	
+	<style>
+		/* Custom styles for better appearance */
+		.pdf-viewer-container {
+			border: 1px solid #dee2e6;
+		}
+		
+		.pdf-viewer-container::-webkit-scrollbar {
+			width: 12px;
+			height: 12px;
+		}
+		
+		.pdf-viewer-container::-webkit-scrollbar-track {
+			background: #f1f1f1;
+			border-radius: 6px;
+		}
+		
+		.pdf-viewer-container::-webkit-scrollbar-thumb {
+			background: #c1c1c1;
+			border-radius: 6px;
+		}
+		
+		.pdf-viewer-container::-webkit-scrollbar-thumb:hover {
+			background: #a8a8a8;
+		}
+		
+		/* Ensure minimum height for mobile */
+		@media (max-width: 768px) {
+			.col-md-8 {
+				margin-top: 2rem;
+			}
+			
+			.pdf-viewer-container {
+				height: 60vh !important;
+			}
+		}
+		
+		/* Button hover effects */
+		.btn-outline-secondary:hover {
+			transform: translateY(-1px);
+			transition: transform 0.1s ease;
+		}
+		
+		.btn-outline-primary:hover {
+			transform: translateY(-1px);
+			transition: transform 0.1s ease;
+		}
+	</style>
+{% endblock %}

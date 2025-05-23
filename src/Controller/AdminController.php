@@ -32,7 +32,7 @@ class AdminController extends AbstractController
             'companies_count' => $companyRepository->count([]),
             'supervisors_count' => $supervisorRepository->count([]),
             'offers_count' => $offerRepository->count([]),
-            'recent_applications' => $applicationRepository->findBy([], ['createdAt' => 'DESC'], 5),
+            'recent_applications' => $applicationRepository->findBy([], ['appliedAt' => 'DESC'], 5),
             'recent_offers' => $offerRepository->findBy([], ['createdAt' => 'DESC'], 5),
         ]);
     }
